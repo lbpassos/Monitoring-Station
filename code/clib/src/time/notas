@@ -1,0 +1,9 @@
+time_t representa o numero de segundos UTC desde 
+Quinta-Feira, 1 de Janeiro de 1970
+
+Acima do equador a hora de verao da-se entre Marco e Setembro
+Abaixo do equador a hora de verao da-se entre Setembro e Marco
+
+
+(YYYY)MMDDHH+W
+(YYYY)MMDDHH-W

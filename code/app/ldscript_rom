@@ -1,0 +1,80 @@
+
+
+/*
+ * ldscript_rom
+ *
+ *  Created on: 5 Ago 2013
+ *      Author: lpassos
+ */
+
+ENTRY (_start)
+
+MEMORY {
+	  flash	: ORIGIN = 0, 				LENGTH = 128K/* FLASH */
+		ram	: ORIGIN = 0x40000000+64,	LENGTH = 64K-64-32 /*free RAM */
+}
+
+SECTIONS {
+
+.startup : {
+	*(.startup*)
+} > flash
+
+.text ALIGN(4) : {
+	*(.text)
+	*(.text.rand)
+	*(.text.srand)
+	*(.text.memmove)
+	*(.text.memset)
+	
+	*(.glue*)
+	*(.rodata) 
+    *(.rodata*)
+	*(.gnu.linkonce*)
+	*(.eh_frame*)
+} > flash
+
+. = ALIGN(4);
+__rom_data_start__ = .; /* + SIZEOF(.text); */
+.data : AT (__rom_data_start__) {
+    	__data_start__ = ABSOLUTE(.);
+	*(.data*)
+	. = ALIGN(4);
+    	__data_end__ = ABSOLUTE(.);
+} > ram
+
+end = .;
+
+.bss ALIGN(4) :{
+    	__bss_start__ = ABSOLUTE(.);
+    	*(.bss*) *(COMMON); 	
+	. = ALIGN(4);
+  	__bss_end__ = ABSOLUTE(.);
+} > ram
+
+
+.stack ALIGN(4) : {
+	*(.stack*)
+} > ram
+
+
+__fastcode_load = __rom_data_start__ + SIZEOF(.data) + SIZEOF(.bss);
+.fastcode ALIGN(4): AT (__fastcode_load ){
+	__fastcode_start__ = ABSOLUTE(.);
+	*(.glue*)
+	*(.text.fastcode)
+	. = ALIGN(4);
+	__fastcode_end__ = ABSOLUTE(.);
+} > ram
+
+
+  /* Stabs debugging sections.  */
+  .stab          0 : { *(.stab) }
+  .stabstr       0 : { *(.stabstr) }
+  .stab.excl     0 : { *(.stab.excl) }
+  .stab.exclstr  0 : { *(.stab.exclstr) }
+  .stab.index    0 : { *(.stab.index) }
+  .stab.indexstr 0 : { *(.stab.indexstr) }
+  .comment       0 : { *(.comment) }
+
+} /* end of sections */
